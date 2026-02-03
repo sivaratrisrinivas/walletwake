@@ -1,0 +1,13 @@
+{
+  "name": "walletwake",
+  "private": true,
+  "workspaces": ["apps/*", "services/*"],
+  "scripts": {
+    "dev": "bunx concurrently -n web,api -c blue,green \"bun --cwd apps/web dev\" \"bun --cwd services/api dev\"",
+    "dev:web": "bun --cwd apps/web dev",
+    "dev:api": "bun --cwd services/api dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
