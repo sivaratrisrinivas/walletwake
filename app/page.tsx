@@ -1,65 +1,86 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { SearchInput } from "@/app/components/SearchInput";
+import { ProductCard } from "@/app/components/ProductCard";
+
+// Schema matching our API response
+interface Product {
+  itemId: string;
+  title: string;
+  price: { value: string; currency: string };
+  image: { imageUrl: string };
+  itemWebUrl: string;
+}
 
 export default function Home() {
+  const [results, setResults] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = async (query: string) => {
+    setIsLoading(true);
+    setHasSearched(true);
+    try {
+      const res = await fetch(`/api/ebay/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      if (data.itemSummaries) {
+        setResults(data.itemSummaries);
+      }
+    } catch (error) {
+      console.error("Search failed", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectProduct = (product: Product) => {
+    console.log("Starting Funeral for:", product.title);
+    // Sprint 2 TODO: Trigger the 'Funeral' mode via State or Tambo
+    alert(`RIP Wallet. Preparing funeral for ${product.title}...`);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-background flex flex-col items-center py-20 px-4 transition-colors duration-500">
+      <div className="z-10 w-full max-w-5xl flex flex-col items-center gap-10">
+
+        {/* Hero Section */}
+        <div className="text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h1 className="text-6xl font-extrabold tracking-tighter text-black dark:text-white">
+            WalletWake
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-zinc-500 dark:text-zinc-400 text-lg max-w-md mx-auto">
+            The impulse buy funeral service.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Search */}
+        <div className="w-full flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100">
+          <SearchInput onSearch={handleSearch} isLoading={isLoading} />
         </div>
-      </main>
-    </div>
+
+        {/* Results Grid */}
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          {results.map((item, idx) => (
+            <div key={item.itemId} className="animate-in fade-in zoom-in duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
+              <ProductCard
+                title={item.title}
+                price={item.price.value}
+                currency={item.price.currency}
+                imageUrl={item.image.imageUrl}
+                onClick={() => handleSelectProduct(item)}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {hasSearched && results.length === 0 && !isLoading && (
+          <div className="text-zinc-400 mt-12 text-center">
+            No products found.<br />The universe is telling you to save money.
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
