@@ -26,7 +26,8 @@ export function SearchInput({ onSearch, isLoading }: SearchInputProps) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="What do you want to buy?"
-                    className="w-full h-14 pl-12 pr-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-lg"
+                    // FIX: Added 'text-black dark:text-white' explicitly below
+                    className="w-full h-14 pl-12 pr-4 bg-white dark:bg-zinc-900 text-black dark:text-white border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-lg placeholder:text-zinc-400"
                     disabled={isLoading}
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
