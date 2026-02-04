@@ -1,78 +1,65 @@
-# ⚰️ WalletWake - The Impulse Buy Funeral Service
+# ⚰️ WalletWake — The Impulse Buy Funeral Service
 
 **"The UI Strikes Back" Hackathon Submission**
-
-WalletWake is an AI-powered financial intervention agent. Instead of making it easy to buy things, it makes it incredibly painful (and hilarious). It uses **Generative UI**, **Voice Synthesis**, and **Multimodal Reasoning** to roast your bad spending habits before you click "Checkout."
 
 <p align="center">
   <img src="./public/walletwake.png" alt="WalletWake" width="640" />
 </p>
 
-## 🚀 Key Features
+---
 
-* **Generative UI (Tambo SDK):** The interface is not static. If you express a desire to buy something, the AI generates a custom **"Funeral Ticket"** or **"Roast Receipt"** component on the fly, populated with unique reasons why you shouldn't buy it.
-* **Multimodal Shame (Gemini 1.5 Flash + Imagen 3):**
-    * **Text:** Generates savage, context-aware insults about your purchase.
-    * **Vision:** Generates a "cinematic gloom" image of the product you're wasting money on using the `gemini-2.5-flash-image` model.
-* **Audio Eulogies (ElevenLabs Turbo v2.5):** * When you enter the "Funeral Mode," the app generates a unique, text-to-speech eulogy for your money using a custom "Disappointed Narrator" voice.
-    * Powered by low-latency streaming for instant playback.
-* **Impulse Friction:** A 48-hour countdown timer that physically prevents you from accessing the "Buy" link until the urge passes.
+## What
 
-## 🛠️ Tech Stack
+WalletWake is an app that gets between you and the "buy now" button. You say what you want (in chat or via search). The app shows a **funeral** for that purchase: the price in ramen packs, coffees, hours of work, plus a spoken eulogy and a gloomy picture of the thing. Then a **48-hour wait**. After that you can buy with a clear head or walk away.
 
-* **Framework:** Next.js 15 (App Router)
-* **AI Agent:** Tambo SDK (for Tool Calling & Generative UI)
-* **LLM & Vision:** Google Gemini 1.5 Flash & Gemini 2.5 (Nano)
-* **Voice AI:** ElevenLabs (Turbo v2.5 Model)
-* **Styling:** TailwindCSS + Lucide Icons
+---
 
-## ⚙️ Setup & Installation
+## Why
 
-1.  **Clone the repo:**
-    ```bash
-    git clone [https://github.com/yourusername/walletwake.git](https://github.com/yourusername/walletwake.git)
-    cd walletwake
-    ```
+Impulse buys feel good for five minutes. This adds friction so you see the real cost and hear it roasted out loud. If you still want it after 48 hours, fine — that’s a choice, not a reflex.
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    npm install @google/genai
-    ```
+---
 
-3.  **Set up Environment Variables:**
-    Create a `.env.local` file in the root:
-    ```env
-    # Tambo (Generative UI)
-    NEXT_PUBLIC_TAMBO_API_KEY=your_tambo_key
+## How
 
-    # Google Gemini (Text & Image Gen)
-    GEMINI_API_KEY=your_google_ai_studio_key
+**Using it**
 
-    # ElevenLabs (Voice)
-    ELEVENLABS_API_KEY=your_elevenlabs_key
-    ELEVENLABS_VOICE_ID=pNInz6obpgDQGcFmaJgB
-    ```
+- **Search:** Use the main bar, pick a product, click **Select** → you get a funeral ticket.
+- **Chat:** Open the chat bubble and say e.g. *"I want a PS5"* or *"Break down the cost of an iPhone"*. The app shows a **Funeral Ticket** or **Roast Receipt** with a reason not to buy.
+- **Enter Funeral Mode:** Click **Enter Funeral Mode** on the ticket. You get a full-screen funeral: guilt math (price as ramen, coffee, etc.), a 48-hour countdown, a custom gloomy image of the product, and a spoken eulogy. Turn sound on.
+- **After 48 hours:** A "Clarity" screen lets you buy or close. Or use **Skip 48h** in dev to test.
 
-4.  **Run the Development Server:**
-    ```bash
-    npm run dev
-    ```
+**Running it**
 
-5.  **Experience the Shame:**
-    * Open `http://localhost:3000`.
-    * Search for "PS5" or "Gucci Slides".
-    * Open the Chat Bubble and ask: *"Analyze the cost of an iPhone 16".*
-    * Click "Enter Funeral Mode" and turn your sound on.
+1. Clone the repo, then:
+   ```bash
+   cd walletwake
+   npm install
+   ```
+2. Add a `.env.local` in the project root:
+   ```env
+   NEXT_PUBLIC_TAMBO_API_KEY=your_tambo_key
+   GEMINI_API_KEY=your_google_ai_studio_key
+   ELEVENLABS_API_KEY=your_elevenlabs_key
+   ELEVENLABS_VOICE_ID=pNInz6obpgDQGcFmaJgB
+   ```
+3. Start the app:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000). Search for "PS5" or "Gucci", or ask in chat for a cost breakdown, then click **Enter Funeral Mode** and turn sound on.
 
-## 🧠 How It Works (The "UI Strikes Back" Logic)
+---
 
-1.  **User Intent:** The user types "I want a PS5" in the chat.
-2.  **Tool Selection:** The Tambo Agent analyzes the intent and selects the `funeral-ticket` tool.
-3.  **Generative Props:** The LLM fills the component props (`price`, `reason`, `productTitle`) based on its knowledge of the product.
-4.  **Component Rendering:** The React component is rendered inside the chat stream.
-5.  **Multimodal Expansion:** When the user accepts the ticket, Gemini generates a custom image, and ElevenLabs streams a generated audio eulogy.
+## What’s inside (plain terms)
 
-## 🏆 Hackathon Tracks
-* **Best Use of Generative UI**
-* **Most Creative AI Agent**
+- **Chat + search:** You say what you want; the app decides whether to show a Funeral Ticket or Roast Receipt and fills in price, product name, and a reason not to buy.
+- **Funeral view:** Custom image of the product (gloomy style), price converted to ramen/coffee/work, 48-hour timer, and a spoken eulogy.
+- **Tech:** Next.js, Tambo (chat + dynamic UI), Google (text + images), ElevenLabs (voice), Tailwind.
+
+---
+
+## Hackathon tracks
+
+- Best Use of Generative UI  
+- Most Creative AI Agent  
