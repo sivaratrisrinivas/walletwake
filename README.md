@@ -5,7 +5,7 @@
 WalletWake is an AI-powered financial intervention agent. Instead of making it easy to buy things, it makes it incredibly painful (and hilarious). It uses **Generative UI**, **Voice Synthesis**, and **Multimodal Reasoning** to roast your bad spending habits before you click "Checkout."
 
 <p align="center">
-  <img src="./assets/images/walletwake.png" alt="WalletWake" width="640" />
+  <img src="./public/walletwake.png" alt="WalletWake" width="640" />
 </p>
 
 ## 🚀 Key Features
