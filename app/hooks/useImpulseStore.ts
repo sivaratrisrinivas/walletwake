@@ -11,6 +11,7 @@ export interface FuneralState {
     deathDate: number; // Timestamp when funeral started
 }
 
+
 export function useImpulseStore() {
     const [state, setState] = useState<FuneralState | null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -49,10 +50,27 @@ export function useImpulseStore() {
         localStorage.removeItem("walletwake_funeral");
     };
 
+    const isResurrected = () => {
+        if (!state) return false;
+        const now = Date.now();
+        const resurrectionTime = state.deathDate + (48 * 60 * 60 * 1000);
+        return now > resurrectionTime;
+    };
+
     return {
         funeralState: state,
         startFuneral,
         clearFuneral,
-        isLoaded
+        isResurrected: isResurrected(), // Export the result
+        isLoaded,
+        // Hack for Demo: Function to fast-forward time
+        fastForward: () => {
+            if (!state) return;
+            const oldState = { ...state, deathDate: Date.now() - (49 * 60 * 60 * 1000) }; // Set to 49 hours ago
+            setState(oldState);
+            localStorage.setItem("walletwake_funeral", JSON.stringify(oldState));
+            window.location.reload();
+        }
     };
+
 }
