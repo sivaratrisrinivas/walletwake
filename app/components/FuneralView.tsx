@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { FuneralState } from "@/app/hooks/useImpulseStore";
 import { getConversions, Conversion } from "@/lib/currency-converter";
 import { useAlternatives } from "@/app/hooks/useAlternatives"; // Import Hook
+import { EulogyPlayer } from "./EulogyPlayer";
 
 export function FuneralView({ state }: { state: FuneralState }) {
     const [timeLeft, setTimeLeft] = useState("");
@@ -54,7 +55,7 @@ export function FuneralView({ state }: { state: FuneralState }) {
 
     return (
         <div className="fixed inset-0 z-50 bg-black text-white flex flex-col items-center p-6 animate-in fade-in duration-1000 overflow-y-auto">
-
+            <EulogyPlayer productName={state.productTitle} price={state.productPrice} />
             <div className="max-w-md w-full text-center space-y-8 py-10">
 
                 {/* ... (Keep Header, Image, Price, Grid sections exactly as they were) ... */}

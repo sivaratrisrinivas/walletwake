@@ -21,3 +21,8 @@
 body {
   @apply bg-background text-foreground;
 }
+
+/* Next.js dev tools portal: hide entirely from UI */
+nextjs-portal {
+  display: none !important;
+}

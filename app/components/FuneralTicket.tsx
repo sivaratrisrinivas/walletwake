@@ -13,19 +13,31 @@ export interface FuneralTicketProps {
 export function FuneralTicket({ productTitle, price, currency, reason }: FuneralTicketProps) {
     const { startFuneral } = useImpulseStore();
 
-    const handleEnterFuneral = () => {
-        // 1. Save data to LocalStorage
+    const handleEnterFuneral = async () => {
+        // 1. Generate a custom image first
+        let finalImage = "https://placehold.co/400x400/000000/FFF?text=Impulse+Item";
+
+        try {
+            const res = await fetch("/api/generate-image", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: `A cinematic, dramatic shot of ${productTitle}, gloomy lighting, hyperrealistic` }),
+            });
+            const data = await res.json();
+            if (data.imageUrl) finalImage = data.imageUrl;
+        } catch (e) {
+            console.error("Image gen failed, using placeholder");
+        }
+
+        // 2. Save and Start Funeral
         startFuneral({
             title: productTitle,
             price: { value: price.toString(), currency: currency },
-            image: { imageUrl: "https://placehold.co/400x400/000000/FFF?text=Impulse+Item" },
+            image: { imageUrl: finalImage },
             itemWebUrl: "#"
         });
 
-        // 2. FIX: FORCE RELOAD so the main page sees the change
-        setTimeout(() => {
-            window.location.reload();
-        }, 100);
+        setTimeout(() => window.location.reload(), 100);
     };
 
     return (
