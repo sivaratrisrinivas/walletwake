@@ -2,59 +2,84 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { FuneralState } from "@/app/hooks/useImpulseStore";
-import { Check, ShoppingBag } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 
-export function ClarityView({ state, onClear }: { state: FuneralState; onClear: () => void }) {
-
-    const handlePurchase = () => {
-        window.open(state.imageUrl.includes("ebay") ? state.imageUrl : "https://ebay.com", "_blank");
-        onClear(); // Reset app
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 bg-white text-black flex flex-col items-center justify-center p-6 animate-in fade-in duration-1000">
-
-            <div className="max-w-md w-full text-center space-y-10">
-
-                <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
-                        <Check className="w-10 h-10 text-green-600" />
-                    </div>
-                </div>
-
-                <h1 className="text-4xl font-bold tracking-tight text-zinc-900">
-                    The impulse has passed.
-                </h1>
-
-                <p className="text-zinc-500 text-lg">
-                    You waited 48 hours. If you still want this, it is a deliberate choice, not a mistake.
-                </p>
-
-                {/* Product Recap */}
-                <div className="flex items-center gap-4 bg-zinc-50 p-4 rounded-xl border border-zinc-200 text-left">
-                    <img src={state.imageUrl} className="w-16 h-16 object-contain mix-blend-multiply" />
-                    <div>
-                        <div className="font-medium line-clamp-1">{state.productTitle}</div>
-                        <div className="font-bold text-zinc-900">${state.productPrice}</div>
-                    </div>
-                </div>
-
-                <button
-                    onClick={handlePurchase}
-                    className="w-full py-4 bg-black text-white rounded-xl font-bold text-lg hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
-                >
-                    <ShoppingBag className="w-5 h-5" />
-                    Purchase with Clarity
-                </button>
-
-                <button
-                    onClick={onClear}
-                    className="text-sm text-zinc-400 hover:text-black underline"
-                >
-                    I don't want it anymore (Close)
-                </button>
-
-            </div>
-        </div>
+export function ClarityView({
+  state,
+  onClear,
+}: {
+  state: FuneralState;
+  onClear: () => void;
+}) {
+  const handlePurchase = () => {
+    window.open(
+      state.imageUrl.includes("ebay") ? state.imageUrl : "https://ebay.com",
+      "_blank"
     );
+    onClear();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 animate-fade-in">
+      <div className="max-w-sm w-full text-center space-y-10">
+        {/* Success indicator */}
+        <div className="flex justify-center animate-scale-in">
+          <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center animate-gentle-pulse">
+            <Check className="w-9 h-9 text-success" />
+          </div>
+        </div>
+
+        {/* Message */}
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: "150ms" }}>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            The impulse has passed.
+          </h1>
+          <p className="text-muted-foreground text-[15px] leading-relaxed max-w-xs mx-auto">
+            You waited 48 hours. If you still want this, it&apos;s a deliberate
+            choice — not a reflex.
+          </p>
+        </div>
+
+        {/* Product recap */}
+        <div
+          className="flex items-center gap-4 bg-surface p-4 rounded-[var(--radius-lg)] border border-border text-left animate-slide-up"
+          style={{ animationDelay: "250ms" }}
+        >
+          <div className="w-16 h-16 rounded-[var(--radius-md)] bg-surface-raised overflow-hidden flex items-center justify-center p-2 shrink-0">
+            <img
+              src={state.imageUrl}
+              alt={state.productTitle}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="font-medium text-sm line-clamp-1 text-foreground">
+              {state.productTitle}
+            </div>
+            <div className="font-semibold text-foreground mt-0.5">
+              ${state.productPrice}
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: "350ms" }}>
+          <button
+            onClick={handlePurchase}
+            className="w-full py-3.5 bg-accent text-accent-foreground rounded-full font-semibold text-[15px] hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+          >
+            Purchase with clarity
+            <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={onClear}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            I don&apos;t want it anymore
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

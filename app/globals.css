@@ -1,28 +1,176 @@
 @import "tailwindcss";
 
+/*
+ * WalletWake — Jony Ive × Dalmasca / Altana
+ *
+ * Dalmasca: desert warmth — sandy golds, terracotta, sunbaked stone
+ * Altana:   ethereal light — pearl whites, soft amber, celestial warmth
+ *
+ * Principles: radical reduction, precision typography,
+ *             subtle materiality, purposeful motion.
+ */
+
 @theme {
-  /* This tells Tailwind v4 to create bg-background and text-foreground classes */
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-fg);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-fg);
+  --color-accent-hover: var(--accent-hover);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-fg);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(29, 27, 24, 0.04);
+  --shadow-md: 0 4px 12px rgba(29, 27, 24, 0.06);
+  --shadow-lg: 0 8px 30px rgba(29, 27, 24, 0.08);
+  --shadow-xl: 0 16px 50px rgba(29, 27, 24, 0.10);
+  --shadow-glow: 0 0 40px rgba(196, 154, 108, 0.15);
+
+  /* Radii — Ive likes generous, precise radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
 }
 
-/* Define the actual HSL color values here */
+/* ─── Light (Altana — ethereal warmth) ─── */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  --bg: #FAF8F4;
+  --fg: #1D1B18;
+  --surface: #F3EDE4;
+  --surface-raised: #FFFFFF;
+  --muted: #F5F0E8;
+  --muted-fg: #7A7468;
+  --accent: #C49A6C;
+  --accent-fg: #FFFFFF;
+  --accent-hover: #B08550;
+  --danger: #A65D3F;
+  --danger-soft: rgba(166, 93, 63, 0.08);
+  --success: #6B7F5E;
+  --border: #E8E1D6;
+  --border-subtle: #F0EBE3;
+  --card: #FFFFFF;
+  --card-fg: #1D1B18;
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(232, 225, 214, 0.5);
 }
 
+/* ─── Dark (Dalmasca — warm charcoal depths) ─── */
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
+  --bg: #141210;
+  --fg: #EDE7DE;
+  --surface: #1E1C19;
+  --surface-raised: #252220;
+  --muted: #1E1C19;
+  --muted-fg: #8A8078;
+  --accent: #D4A574;
+  --accent-fg: #141210;
+  --accent-hover: #E0B88A;
+  --danger: #C87A5A;
+  --danger-soft: rgba(200, 122, 90, 0.12);
+  --success: #8B9F7B;
+  --border: #332F2A;
+  --border-subtle: #2A2724;
+  --card: #1E1C19;
+  --card-fg: #EDE7DE;
+  --glass: rgba(20, 18, 16, 0.78);
+  --glass-border: rgba(51, 47, 42, 0.5);
 }
 
-/* Apply default styles */
+/* ─── Base ─── */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  @apply bg-background text-foreground;
+  background-color: var(--bg);
+  color: var(--fg);
+  transition: background-color 0.5s ease, color 0.3s ease;
 }
 
-/* Next.js dev tools portal: hide entirely from UI */
+::selection {
+  background-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+/* ─── Scrollbar — minimal, Ive-style ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-fg);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.animate-fade-in { animation: fadeIn 0.6s ease-out both; }
+.animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-down { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-breathe { animation: breathe 3s ease-in-out infinite; }
+.animate-gentle-pulse { animation: gentlePulse 2s ease-in-out infinite; }
+
+/* Staggered children */
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+
+/* ─── Glass surface ─── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid var(--glass-border);
+}
+
+/* ─── Next.js dev portal ─── */
 nextjs-portal {
   display: none !important;
 }

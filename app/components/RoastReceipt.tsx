@@ -1,129 +1,138 @@
 "use client";
 
 import { useImpulseStore } from "@/app/hooks/useImpulseStore";
-import { Scissors, Loader2 } from "lucide-react"; // Import Loader2
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 interface ReceiptItem {
-    label: string;
-    cost: string;
+  label: string;
+  cost: string;
 }
 
 export interface RoastReceiptProps {
-    productName: string;
-    items: ReceiptItem[];
-    total: string;
-    roast: string;
+  productName: string;
+  items: ReceiptItem[];
+  total: string;
+  roast: string;
 }
 
-export function RoastReceipt({ productName, items, total, roast }: RoastReceiptProps) {
-    const { startFuneral } = useImpulseStore();
-    const [isGenerating, setIsGenerating] = useState(false); // New Loading State
+export function RoastReceipt({
+  productName,
+  items,
+  total,
+  roast,
+}: RoastReceiptProps) {
+  const { startFuneral } = useImpulseStore();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-    const handleFuneral = async () => {
-        setIsGenerating(true);
+  const handleFuneral = async () => {
+    setIsGenerating(true);
+    let finalImage =
+      "https://placehold.co/400x400/1D1B18/C49A6C?text=Receipt";
 
-        // 1. Default Placeholder (Safety Net)
-        let finalImage = "https://placehold.co/400x400/000000/FFF?text=Receipt";
+    try {
+      const res = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: `A cinematic, dramatic, high-quality product shot of ${productName}, dark moody lighting`,
+        }),
+      });
+      const data = await res.json();
+      if (data.imageUrl) finalImage = data.imageUrl;
+    } catch (e) {
+      console.error("Image Gen Failed:", e);
+    }
 
-        try {
-            // 2. Call your Nano Banana API
-            const res = await fetch("/api/generate-image", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                // Prompt specifically for the PRODUCT, not the receipt
-                body: JSON.stringify({ prompt: `A cinematic, dramatic, high-quality product shot of ${productName}, dark moody lighting` })
-            });
+    startFuneral({
+      title: productName,
+      price: { value: total.replace(/[^0-9.]/g, ""), currency: "USD" },
+      image: { imageUrl: finalImage },
+      itemWebUrl: "#",
+    });
 
-            const data = await res.json();
-            if (data.imageUrl) {
-                finalImage = data.imageUrl;
-            }
-        } catch (e) {
-            console.error("Image Gen Failed:", e);
-        }
+    setTimeout(() => window.location.reload(), 100);
+  };
 
-        // 3. Save to Store
-        startFuneral({
-            title: productName,
-            price: { value: total.replace(/[^0-9.]/g, ""), currency: "USD" },
-            image: { imageUrl: finalImage }, // <--- Uses the AI Image now
-            itemWebUrl: "#"
-        });
+  return (
+    <div className="my-5 mx-auto w-full max-w-sm animate-scale-in">
+      <div className="bg-[#FAF8F4] text-[#1D1B18] rounded-[var(--radius-lg)] p-6 shadow-xl relative overflow-hidden">
+        {/* Decorative top accent */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C49A6C] via-[#D4A574] to-[#C49A6C]" />
 
-        // 4. Force Reload
-        setTimeout(() => {
-            window.location.reload();
-        }, 100);
-    };
-
-    return (
-        <div className="my-6 mx-auto w-full max-w-sm animate-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white text-black font-mono p-6 shadow-2xl relative">
-
-                {/* Jagged Top */}
-                <div className="absolute top-0 left-0 right-0 h-4 -mt-4 bg-white [mask-image:linear-gradient(to_bottom,transparent,black)]"
-                    style={{ clipPath: "polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)" }}>
-                </div>
-
-                {/* Header */}
-                <div className="text-center border-b-2 border-dashed border-black/20 pb-4 mb-4">
-                    <h2 className="text-xl font-bold uppercase tracking-widest">WalletWake Inc.</h2>
-                    <p className="text-xs text-zinc-500">Official Bill of Bad Decisions</p>
-                    <p className="text-xs mt-1">{new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
-                </div>
-
-                {/* Dynamic Line Items */}
-                <div className="space-y-2 text-sm mb-4">
-                    {items.map((item, i) => (
-                        <div key={i} className="flex justify-between">
-                            <span>{item.label}</span>
-                            <span className="font-bold">{item.cost}</span>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Total */}
-                <div className="border-t-2 border-black border-b-2 py-2 mb-4 flex justify-between text-lg font-bold">
-                    <span>TOTAL LOSS</span>
-                    <span>{total}</span>
-                </div>
-
-                {/* Roast */}
-                <div className="text-center text-xs italic mb-6 px-4">
-                    "{roast}"
-                </div>
-
-                {/* Barcode Footer */}
-                <div className="flex flex-col items-center gap-2 opacity-50">
-                    <div className="h-8 w-full bg-repeat-x" style={{ backgroundImage: "linear-gradient(90deg, #000 50%, transparent 50%)", backgroundSize: "4px 100%" }}></div>
-                    <p className="text-[10px] uppercase">No Refunds on Dignity</p>
-                </div>
-
-                {/* Action Button (Updated with Loading State) */}
-                <button
-                    onClick={handleFuneral}
-                    disabled={isGenerating}
-                    className="mt-6 w-full bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isGenerating ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Generating Shame...
-                        </>
-                    ) : (
-                        <>
-                            <Scissors className="w-4 h-4" />
-                            Accept Fate (Funeral)
-                        </>
-                    )}
-                </button>
-
-                {/* Jagged Bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-4 -mb-4 bg-white"
-                    style={{ clipPath: "polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)" }}>
-                </div>
-            </div>
+        {/* Header */}
+        <div className="text-center border-b border-dashed border-[#E8E1D6] pb-4 mb-4 pt-2">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#1D1B18]">
+            WalletWake Inc.
+          </h2>
+          <p className="text-[11px] text-[#7A7468] mt-0.5">
+            Official Bill of Bad Decisions
+          </p>
+          <p className="text-[10px] text-[#A69E93] mt-1 font-mono">
+            {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
+          </p>
         </div>
-    );
+
+        {/* Line items */}
+        <div className="space-y-2 text-sm mb-4 font-mono">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              className="flex justify-between text-[13px]"
+            >
+              <span className="text-[#7A7468]">{item.label}</span>
+              <span className="font-semibold text-[#1D1B18]">{item.cost}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Total */}
+        <div className="border-t border-b border-[#E8E1D6] py-3 mb-4 flex justify-between items-center">
+          <span className="text-xs uppercase tracking-wide font-semibold text-[#7A7468]">
+            Total Loss
+          </span>
+          <span className="text-xl font-bold text-[#A65D3F]">{total}</span>
+        </div>
+
+        {/* Roast */}
+        <div className="text-center text-[12px] italic text-[#7A7468] mb-5 px-2 leading-relaxed">
+          &ldquo;{roast}&rdquo;
+        </div>
+
+        {/* Barcode */}
+        <div className="flex flex-col items-center gap-2 opacity-30 mb-5">
+          <div
+            className="h-6 w-full"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, #1D1B18 50%, transparent 50%)",
+              backgroundSize: "3px 100%",
+            }}
+          />
+          <p className="text-[9px] uppercase tracking-widest">
+            No Refunds on Dignity
+          </p>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={handleFuneral}
+          disabled={isGenerating}
+          className="w-full bg-[#1D1B18] text-[#FAF8F4] py-3 rounded-full text-[12px] font-semibold uppercase tracking-wider hover:bg-[#332F2A] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              Accept Fate
+              <ArrowRight className="w-3.5 h-3.5" />
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
 }

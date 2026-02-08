@@ -4,118 +4,153 @@
 import { useEffect, useState } from "react";
 import { FuneralState } from "@/app/hooks/useImpulseStore";
 import { getConversions, Conversion } from "@/lib/currency-converter";
-import { useAlternatives } from "@/app/hooks/useAlternatives"; // Import Hook
+import { useAlternatives } from "@/app/hooks/useAlternatives";
 import { EulogyPlayer } from "./EulogyPlayer";
 
 export function FuneralView({ state }: { state: FuneralState }) {
-    const [timeLeft, setTimeLeft] = useState("");
-    const [conversions, setConversions] = useState<Conversion[]>([]);
+  const [timeLeft, setTimeLeft] = useState("");
+  const [conversions, setConversions] = useState<Conversion[]>([]);
 
-    // New Hook Call
-    const { alternatives, loading: altLoading } = useAlternatives(
-        state.productTitle,
-        parseFloat(state.productPrice)
-    );
+  const { alternatives } = useAlternatives(
+    state.productTitle,
+    parseFloat(state.productPrice)
+  );
 
-    // ... (Keep existing Conversion useEffect) ...
-    useEffect(() => {
-        const price = parseFloat(state.productPrice);
-        if (!isNaN(price)) {
-            setConversions(getConversions(price));
-        }
-    }, [state.productPrice]);
+  useEffect(() => {
+    const price = parseFloat(state.productPrice);
+    if (!isNaN(price)) setConversions(getConversions(price));
+  }, [state.productPrice]);
 
-    // ... (Keep existing Timer useEffect) ...
-    useEffect(() => {
-        const timer = setInterval(() => {
-            const now = Date.now();
-            const target = state.deathDate + (48 * 60 * 60 * 1000);
-            const diff = target - now;
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const target = state.deathDate + 48 * 60 * 60 * 1000;
+      const diff = target - Date.now();
 
-            if (diff <= 0) {
-                setTimeLeft("00:00:00");
-                clearInterval(timer);
-                return;
-            }
-            const hours = Math.floor((diff / (1000 * 60 * 60)));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [state.deathDate]);
+      if (diff <= 0) {
+        setTimeLeft("00:00:00");
+        clearInterval(timer);
+        return;
+      }
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeLeft(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`
+      );
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [state.deathDate]);
 
-    // New Handler for "Buy Anyway"
-    const handleBuyAnyway = () => {
-        // Open eBay in new tab
-        window.open("https://www.ebay.com/itm/123456", "_blank");
-        // Ideally, here we would call 'commitSin()' to log it to the Graveyard
-        alert("Shame recorded. Redirecting to eBay...");
-    };
+  const handleBuyAnyway = () => {
+    window.open("https://www.ebay.com", "_blank");
+  };
 
-    return (
-        <div className="fixed inset-0 z-50 bg-black text-white flex flex-col items-center p-6 animate-in fade-in duration-1000 overflow-y-auto">
-            <EulogyPlayer productName={state.productTitle} price={state.productPrice} />
-            <div className="max-w-md w-full text-center space-y-8 py-10">
+  return (
+    <div className="fixed inset-0 z-50 bg-[#0D0C0A] text-[#EDE7DE] flex flex-col items-center overflow-y-auto">
+      <EulogyPlayer productName={state.productTitle} price={state.productPrice} />
 
-                {/* ... (Keep Header, Image, Price, Grid sections exactly as they were) ... */}
-                <div className="space-y-2">
-                    <h1 className="text-2xl font-mono text-zinc-500 tracking-widest uppercase">Impulse Funeral</h1>
-                    <p className="text-zinc-600 text-sm">Processing grief for your wallet...</p>
-                </div>
+      <div className="w-full max-w-lg mx-auto px-6 py-16 space-y-10">
+        {/* Header */}
+        <header className="text-center space-y-2 animate-fade-in">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-[#8A8078] uppercase">
+            impulse funeral
+          </div>
+          <p className="text-[#5A5550] text-sm">Processing grief for your wallet</p>
+        </header>
 
-                <div className="relative w-40 h-40 mx-auto grayscale opacity-80">
-                    <img src={state.imageUrl} alt="The deceased" className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
-                </div>
-
-                <div className="bg-zinc-900/30 rounded-2xl p-6 border border-zinc-800">
-                    <h2 className="text-5xl font-bold mb-6">{state.currency === "USD" ? "$" : state.currency}{state.productPrice}</h2>
-                    <div className="grid grid-cols-2 gap-3 text-left">
-                        {conversions.map((c, i) => (
-                            <div key={i} className="bg-zinc-900 p-3 rounded-lg border border-zinc-800 flex items-center gap-3">
-                                <span className="text-2xl">{c.emoji}</span>
-                                <div>
-                                    <div className="text-xl font-bold text-red-400">{c.count}</div>
-                                    <div className="text-[10px] text-zinc-500 uppercase font-medium">{c.item}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="p-6 border border-zinc-800 rounded-2xl bg-zinc-900/50">
-                    <div className="text-xs text-zinc-400 uppercase tracking-widest mb-2">Resurrection In</div>
-                    <div className="text-4xl sm:text-5xl font-mono font-light tracking-wider tabular-nums">{timeLeft}</div>
-                </div>
-
-                {/* --- NEW SECTION: ALTERNATIVES --- */}
-                {alternatives.length > 0 && (
-                    <div className="space-y-4 pt-4 border-t border-zinc-800">
-                        <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest">Cheaper Alternatives</h3>
-                        <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-                            {alternatives.map((item) => (
-                                <div key={item.itemId} className="snap-center shrink-0 w-32 bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-left">
-                                    <div className="w-full h-24 bg-white rounded-lg mb-2 overflow-hidden">
-                                        <img src={item.image.imageUrl} className="w-full h-full object-contain" />
-                                    </div>
-                                    <div className="text-xs text-zinc-400 truncate">{item.title}</div>
-                                    <div className="font-bold text-green-400">${item.price.value}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* --- NEW SECTION: BUY ANYWAY BUTTON --- */}
-                <button
-                    onClick={handleBuyAnyway}
-                    className="w-full py-4 rounded-xl border border-red-900/50 text-red-700 hover:bg-red-950/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 font-mono text-sm"
-                >
-                    <span>🤡</span>
-                    I have no self control. Buy Anyway.
-                </button>
-
-            </div>
+        {/* Product Image — somber, desaturated */}
+        <div className="flex justify-center animate-scale-in" style={{ animationDelay: "200ms" }}>
+          <div className="relative w-44 h-44 rounded-[var(--radius-xl)] overflow-hidden bg-white/5 border border-white/10 p-6 flex items-center justify-center">
+            <img
+              src={state.imageUrl}
+              alt="The deceased"
+              className="w-full h-full object-contain grayscale opacity-70"
+            />
+            {/* Subtle vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0C0A]/60 via-transparent to-transparent pointer-events-none" />
+          </div>
         </div>
-    );
+
+        {/* Price display */}
+        <div className="text-center animate-slide-up" style={{ animationDelay: "300ms" }}>
+          <div className="text-5xl font-semibold tracking-tight">
+            {state.currency === "USD" ? "$" : state.currency}
+            {state.productPrice}
+          </div>
+          <div className="text-sm text-[#5A5550] mt-2 line-clamp-1">{state.productTitle}</div>
+        </div>
+
+        {/* Reality check grid */}
+        <div
+          className="grid grid-cols-2 gap-3 animate-slide-up"
+          style={{ animationDelay: "400ms" }}
+        >
+          {conversions.map((c, i) => (
+            <div
+              key={i}
+              className="bg-white/[0.03] border border-white/[0.06] rounded-[var(--radius-md)] p-4 flex items-center gap-3"
+            >
+              <span className="text-xl">{c.emoji}</span>
+              <div>
+                <div className="text-xl font-semibold text-[#D4A574]">{c.count}</div>
+                <div className="text-[10px] text-[#6A6560] uppercase tracking-wide font-medium">
+                  {c.item}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Countdown */}
+        <div
+          className="text-center p-8 rounded-[var(--radius-xl)] bg-white/[0.03] border border-white/[0.06] animate-slide-up"
+          style={{ animationDelay: "500ms" }}
+        >
+          <div className="text-[10px] text-[#6A6560] uppercase tracking-[0.2em] font-medium mb-3">
+            Resurrection in
+          </div>
+          <div className="text-4xl sm:text-5xl font-light tracking-[0.12em] tabular-nums font-mono text-[#EDE7DE]">
+            {timeLeft}
+          </div>
+        </div>
+
+        {/* Alternatives */}
+        {alternatives.length > 0 && (
+          <div className="space-y-4 pt-2 animate-slide-up" style={{ animationDelay: "600ms" }}>
+            <h3 className="text-[11px] font-mono text-[#6A6560] uppercase tracking-widest text-center">
+              Cheaper alternatives
+            </h3>
+            <div className="flex gap-3 overflow-x-auto pb-3 snap-x scrollbar-none">
+              {alternatives.map((item: any) => (
+                <div
+                  key={item.itemId}
+                  className="snap-center shrink-0 w-32 bg-white/[0.03] border border-white/[0.06] rounded-[var(--radius-md)] p-3"
+                >
+                  <div className="w-full h-20 bg-white/5 rounded-lg mb-2 overflow-hidden flex items-center justify-center">
+                    <img
+                      src={item.image.imageUrl}
+                      alt={item.title}
+                      className="w-full h-full object-contain opacity-80"
+                    />
+                  </div>
+                  <div className="text-[11px] text-[#8A8078] truncate">{item.title}</div>
+                  <div className="text-sm font-semibold text-[#8B9F7B]">${item.price.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Buy anyway — shameful, de-emphasized */}
+        <div className="pt-4 animate-fade-in" style={{ animationDelay: "700ms" }}>
+          <button
+            onClick={handleBuyAnyway}
+            className="w-full py-3.5 rounded-full border border-white/[0.06] text-[#5A5550] hover:text-[#C87A5A] hover:border-[#C87A5A]/20 hover:bg-[#C87A5A]/5 transition-all text-sm font-medium"
+          >
+            I have no self control. Buy anyway.
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
