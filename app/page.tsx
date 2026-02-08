@@ -1,50 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { SearchInput } from "@/app/components/SearchInput";
-import { ProductCard } from "@/app/components/ProductCard";
 import { FuneralView } from "@/app/components/FuneralView";
 import { ClarityView } from "@/app/components/ClarityView";
 import { useImpulseStore } from "@/app/hooks/useImpulseStore";
-import { ChatOverlay } from "@/app/components/ChatOverlay";
-
-interface Product {
-  itemId: string;
-  title: string;
-  price: { value: string; currency: string };
-  image: { imageUrl: string };
-  itemWebUrl: string;
-}
+import { ChatOverlay, openChat } from "@/app/components/ChatOverlay";
+import { MessageCircle, ArrowRight } from "lucide-react";
 
 export default function Home() {
   const {
     funeralState,
-    startFuneral,
     clearFuneral,
     isResurrected,
     isLoaded,
     fastForward,
   } = useImpulseStore();
-
-  const [results, setResults] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const handleSearch = async (query: string) => {
-    setIsLoading(true);
-    setHasSearched(true);
-    try {
-      const res = await fetch(
-        `/api/ebay/search?q=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
-      if (data.itemSummaries) setResults(data.itemSummaries);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (!isLoaded) return null;
 
@@ -66,49 +35,32 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-5 pt-32 pb-20 transition-colors duration-500">
-      <div className="w-full max-w-3xl flex flex-col items-center gap-16">
+    <main className="min-h-screen flex flex-col items-center justify-center px-5 transition-colors duration-500">
+      <div className="w-full max-w-2xl flex flex-col items-center gap-12 text-center">
         {/* Hero */}
-        <header className="text-center space-y-4 animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-muted-foreground text-xs font-medium tracking-wide border border-border-subtle mb-2">
+        <header className="space-y-6 animate-slide-up">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-muted-foreground text-xs font-medium tracking-wide border border-border-subtle">
             impulse intervention
           </div>
           <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight text-foreground leading-[1.05]">
             WalletWake
           </h1>
-          <p className="text-muted-foreground text-base max-w-sm mx-auto leading-relaxed">
-            Search for what you want. We&apos;ll show you what it really costs.
+          <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
+            Tell me what you want to buy. I&apos;ll show you what it really costs.
           </p>
         </header>
 
-        {/* Search */}
-        <div className="w-full flex justify-center animate-slide-up" style={{ animationDelay: "100ms" }}>
-          <SearchInput onSearch={handleSearch} isLoading={isLoading} />
+        {/* CTA */}
+        <div className="animate-slide-up" style={{ animationDelay: "150ms" }}>
+          <button
+            onClick={() => openChat()}
+            className="group inline-flex items-center gap-2 bg-accent text-accent-foreground px-6 py-3.5 rounded-full font-semibold text-[15px] hover:bg-accent-hover transition-all shadow-lg hover:shadow-xl"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Start Chatting
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
-
-        {/* Results */}
-        {results.length > 0 && (
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
-            {results.map((item) => (
-              <div key={item.itemId} className="animate-scale-in">
-                <ProductCard
-                  title={item.title}
-                  price={item.price.value}
-                  currency={item.price.currency}
-                  imageUrl={item.image.imageUrl}
-                  onClick={() => startFuneral(item)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Empty state */}
-        {hasSearched && results.length === 0 && !isLoading && (
-          <div className="text-muted-foreground text-sm text-center animate-fade-in py-12">
-            Nothing found. The universe agrees — save your money.
-          </div>
-        )}
       </div>
 
       <ChatOverlay />

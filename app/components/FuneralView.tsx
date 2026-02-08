@@ -6,6 +6,7 @@ import { FuneralState } from "@/app/hooks/useImpulseStore";
 import { getConversions, Conversion } from "@/lib/currency-converter";
 import { useAlternatives } from "@/app/hooks/useAlternatives";
 import { EulogyPlayer } from "./EulogyPlayer";
+import { AlternativesCarousel } from "./AlternativesCarousel";
 
 export function FuneralView({ state }: { state: FuneralState }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -116,28 +117,8 @@ export function FuneralView({ state }: { state: FuneralState }) {
 
         {/* Alternatives */}
         {alternatives.length > 0 && (
-          <div className="space-y-4 pt-2 animate-slide-up" style={{ animationDelay: "600ms" }}>
-            <h3 className="text-[11px] font-mono text-[#6A6560] uppercase tracking-widest text-center">
-              Cheaper alternatives
-            </h3>
-            <div className="flex gap-3 overflow-x-auto pb-3 snap-x scrollbar-none">
-              {alternatives.map((item: any) => (
-                <div
-                  key={item.itemId}
-                  className="snap-center shrink-0 w-32 bg-white/[0.03] border border-white/[0.06] rounded-[var(--radius-md)] p-3"
-                >
-                  <div className="w-full h-20 bg-white/5 rounded-lg mb-2 overflow-hidden flex items-center justify-center">
-                    <img
-                      src={item.image.imageUrl}
-                      alt={item.title}
-                      className="w-full h-full object-contain opacity-80"
-                    />
-                  </div>
-                  <div className="text-[11px] text-[#8A8078] truncate">{item.title}</div>
-                  <div className="text-sm font-semibold text-[#8B9F7B]">${item.price.value}</div>
-                </div>
-              ))}
-            </div>
+          <div className="animate-slide-up" style={{ animationDelay: "600ms" }}>
+            <AlternativesCarousel alternatives={alternatives} />
           </div>
         )}
 

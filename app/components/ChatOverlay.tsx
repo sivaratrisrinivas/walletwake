@@ -1,11 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
 import { MessageCircle, X, ArrowUp } from "lucide-react";
+import { useImpulseStore } from "@/app/hooks/useImpulseStore";
+import React from "react";
+
+/**
+ * Parse simple markdown (bold, italic, line breaks) into React elements.
+ */
+function renderMarkdown(text: string): React.ReactNode[] {
+  const clean = text
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+
+  // Split by bold (**) and italic (*) patterns
+  const parts: React.ReactNode[] = [];
+  // Regex: match **bold**, *italic*, or plain text segments
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|([^*]+))/g;
+  let match;
+  let key = 0;
+
+  while ((match = regex.exec(clean)) !== null) {
+    if (match[2]) {
+      // **bold**
+      parts.push(
+        <strong key={key++} className="font-semibold">
+          {match[2]}
+        </strong>
+      );
+    } else if (match[3]) {
+      // *italic*
+      parts.push(
+        <em key={key++} className="italic">
+          {match[3]}
+        </em>
+      );
+    } else if (match[4]) {
+      // plain text
+      parts.push(<React.Fragment key={key++}>{match[4]}</React.Fragment>);
+    }
+  }
+
+  return parts.length > 0 ? parts : [clean];
+}
+
+// Global state to allow opening chat from anywhere
+let openChatCallback: (() => void) | null = null;
+
+export function openChat() {
+  openChatCallback?.();
+}
 
 export function ChatOverlay() {
   const [isOpen, setIsOpen] = useState(false);
+  const { funeralState, isLoaded } = useImpulseStore();
+
+  useEffect(() => {
+    openChatCallback = () => setIsOpen(true);
+    return () => {
+      openChatCallback = null;
+    };
+  }, []);
   const { thread } = useTamboThread();
   const { value, setValue, submit, isPending } = useTamboThreadInput();
 
@@ -14,7 +71,14 @@ export function ChatOverlay() {
     if (value.trim()) submit();
   };
 
+  // Hide button on homepage (when no funeral is active)
+  const isHomepage = isLoaded && !funeralState?.isActive;
+
   if (!isOpen) {
+    // Don't show button on homepage - there's already a big CTA button
+    if (isHomepage) {
+      return null;
+    }
     return (
       <button
         onClick={() => setIsOpen(true)}
@@ -60,7 +124,7 @@ export function ChatOverlay() {
             className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+              className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap ${
                 msg.role === "user"
                   ? "bg-accent text-accent-foreground rounded-br-md"
                   : "bg-surface text-card-foreground rounded-bl-md"
@@ -68,11 +132,15 @@ export function ChatOverlay() {
             >
               {Array.isArray(msg.content) ? (
                 msg.content.map((part: any, i: number) =>
-                  part.type === "text" ? <span key={i}>{part.text}</span> : null
+                  part.type === "text" ? (
+                    <span key={i}>{renderMarkdown(part.text)}</span>
+                  ) : null
                 )
               ) : (
                 <span>
-                  {typeof msg.content === "string" ? msg.content : ""}
+                  {typeof msg.content === "string"
+                    ? renderMarkdown(msg.content as string)
+                    : ""}
                 </span>
               )}
             </div>
