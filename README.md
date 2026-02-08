@@ -3,7 +3,7 @@
 **"The UI Strikes Back" Hackathon Submission**
 
 <p align="center">
-  <img src="./public/walletwake.png" alt="WalletWake" width="640" />
+  <img src="./public/ww.png" alt="WalletWake" width="640" />
 </p>
 
 ---
